@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Environment files and credentials
+.env
+.env.example
+
+# Python cache and byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Pytest / Coverage caches and reports
+.pytest_cache/
+.coverage
+htmlcov/
+tests/.pytest_cache/
+
+# IDE / Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker configurations
+Dockerfile
+docker-compose.yml
+
+# Custom agents and AI configurations
+.gemini/
+.agents/
