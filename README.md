@@ -1,100 +1,110 @@
-# 🚀 FastAPI Minimal Architecture (fast-api-min)
+# FastAPI Minimal Architecture (fast-api-min)
 
-Uma arquitetura de backend extremamente robusta, altamente abstrata e orientada a objetos desenvolvida em cima do **FastAPI**, **SQLAlchemy (Async)**, **PostgreSQL** e **Redis**.
+[Versão em Português (README_PT.md)](README_PT.md)
 
-O projeto elimina o boilerplate comum do FastAPI através de uma camada genérica e flexível para CRUDs, tratamento automatizado de exceções, esquemas dinâmicos no Pydantic, controle granular de acessos (RBAC) e segurança a nível corporativo.
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.139.0-009688?style=flat-square&logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D31D24?style=flat-square&logo=sqlite&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-Passed-0A9EDC?style=flat-square&logo=pytest&logoColor=white)
+
+An extremely robust, highly abstracted, and fully object-oriented (Class-Based) backend architecture built on top of **FastAPI**, **SQLAlchemy (Async)**, **PostgreSQL**, and **Redis**.
+
+The project eliminates common FastAPI boilerplate through a flexible generic layer for CRUDs, automated exception handling, dynamic Pydantic schemas, granular role-based access control (RBAC), and enterprise-grade security.
 
 ---
 
-## 🛠️ Tecnologias Principais
+## Core Technologies
 
 - **Core**: Python 3.11, FastAPI.
-- **Banco de Dados**: PostgreSQL (Engine assíncrona do SQLAlchemy 2.0) & Alembic para migrações.
+- **Database**: PostgreSQL (SQLAlchemy 2.0 Async Engine) & Alembic for migrations.
 - **Cache & Rate-Limit**: Redis.
-- **Segurança**: JWT Auth com rotação de tokens opacos salvos no Redis, Progressive Backoff contra ataques de força bruta, e Headers de Segurança OWASP.
-- **Ambiente**: Docker & Docker Compose.
+- **Security**: JWT Auth with opaque refresh token rotation saved in Redis, Progressive Backoff against brute-force logins, and OWASP Security Headers.
+- **Environment**: Docker & Docker Compose.
 
 ---
 
-## 📁 Estrutura de Diretórios
+## Directory Structure
 
 ```bash
 ├── app/
-│   ├── api/                  # Roteador principal e gerenciador de versões
+│   ├── api/                  # Main router and version manager
 │   ├── core/
-│   │   ├── generics/         # Abstrações base: Modelos, Repositórios, Serviços e Views
-│   │   ├── config.py         # Configurações globais (Pydantic Settings)
-│   │   ├── exceptions.py     # Gerenciamento orientado a objetos de exceções
-│   │   ├── middlewares.py    # Log de requisições, headers OWASP e rate limiters
-│   │   ├── mixins.py         # Mixins de segurança (LoginRequired, StaffRequired, etc)
-│   │   └── security.py       # Utilidades criptográficas e geração de tokens
-│   ├── db/                   # Inicialização de sessão e pool assíncrono (SQLAlchemy / Redis)
-│   └── modules/              # Módulos de domínio (Regras de negócio isoladas)
-│       ├── accounts/         # Cadastro e edição de usuários
-│       ├── auth/             # Login, logout e rotação de tokens
-│       ├── groups/           # Perfis/Grupos de acesso
-│       └── permissions/      # Permissões do sistema (RBAC)
+│   │   ├── generics/         # Base abstractions: Models, Repositories, Services, and Views
+│   │   ├── config.py         # Global settings (Pydantic Settings)
+│   │   ├── exceptions.py     # Object-oriented exception handling
+│   │   ├── middlewares.py    # Request logs, OWASP headers, and rate limiters
+│   │   ├── mixins.py         # Security mixins (LoginRequired, StaffRequired, etc.)
+│   │   └── security.py       # Cryptographic utilities and token generation
+│   ├── db/                   # Session initialization and async pool (SQLAlchemy / Redis)
+│   └── modules/              # Domain modules (Isolated business rules)
+│       ├── accounts/         # User registration and updates
+│       ├── auth/             # Login, logout, and token rotation
+│       ├── groups/           # Access profiles/Groups
+│       └── permissions/      # System permissions (RBAC)
 ```
 
 ---
 
-## 🚀 Como Iniciar o Projeto
+## Getting Started
 
-### Pré-requisitos
-- Docker & Docker Compose instalados.
+### Prerequisites
+- Docker & Docker Compose installed.
 
-### Passos para execução:
+### Steps to run:
 
-1. **Clonar o Repositório e Configurar Variáveis**:
-   Crie o arquivo `.env` com base nas variáveis do projeto:
+1. **Configure Environment Variables**:
+   Create a `.env` file based on the [.env.example](.env.example) template:
    ```env
    POSTGRES_USER=postgres
    POSTGRES_PASSWORD=postgres
    POSTGRES_DB=app_db
    DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/app_db
    REDIS_URL=redis://redis:6379/0
-   SECRET_KEY=sua_secret_key_super_segura
+   SECRET_KEY=your_super_secure_secret_key
    ```
 
-2. **Subir os Containers**:
-   Execute o Docker Compose para baixar as imagens, criar os bancos e iniciar o servidor Uvicorn:
+2. **Spin Up the Containers**:
+   Execute Docker Compose to build images, create databases, and start the Uvicorn server:
    ```bash
    docker compose up -d --build
    ```
 
-3. **Inicializar o Banco de Dados (CLI de Gerenciamento)**:
-   Como o banco é iniciado vazio e as permissões de acesso são protegidas por RBAC, você deve semear as permissões básicas e criar o primeiro usuário administrador interativamente:
+3. **Initialize the Database (Management CLI)**:
+   Since the database starts empty and access is protected by RBAC, you must seed default permissions and create the first administrator user interactively:
    ```bash
-   # Cadastrar as permissões CRUD padrão para os modelos
+   # Seed default CRUD permissions for domain models
    docker compose exec web python cli.py seed-permissions
 
-   # Criar o primeiro superusuário interativamente
+   # Create the first superuser interactively
    docker compose exec web python cli.py createsuperuser
    ```
 
-4. **Verificar os Logs**:
+4. **Verify Container Logs**:
    ```bash
    docker compose logs -f web
    ```
 
-5. **Acessar a API**:
+5. **Access the API**:
    - API Docs (Swagger): [http://localhost:8000/docs](http://localhost:8000/docs)
    - Diagnostic Health Check: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
    - ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
-## 🧪 Rodando os Testes Automatizados
+## Running Automated Tests
 
-Você pode executar a suíte de testes com o `pytest` diretamente dentro do container web:
+You can execute the test suite using `pytest` directly inside the web container:
 ```bash
 docker compose exec web env PYTHONPATH=. pytest
 ```
 
 ---
 
-## 📖 Documentação Completa
+## Complete Documentation
 
-Para uma análise detalhada da arquitetura do projeto, padrões de design orientados a objetos adotados, funcionamento da camada genérica de views, controle de acesso e segurança, acesse o arquivo:
+For an in-depth analysis of the project's architecture, object-oriented patterns, generic views, role-based access control, and security details, please check:
 
-👉 **[DOCUMENTATION.md](DOCUMENTATION.md)**
+[DOCUMENTATION.md](DOCUMENTATION.md)
