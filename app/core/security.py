@@ -1,3 +1,4 @@
+from datetime import timezone
 import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -70,6 +71,7 @@ def create_access_token(subject: str, role: str) -> str:
     to_encode: dict[str, Any] = {
         "sub": subject,
         "role": role,
+        "iat": datetime.now(timezone.utc).timestamp(),
         "jti": str(uuid.uuid4()),
         "exp": expire
     }

@@ -14,8 +14,10 @@ from app.modules.accounts.models import User
 from app.modules.accounts.repositories import UserRepository
 from app.modules.accounts.services import UserService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+import structlog
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+logger = structlog.get_logger("app.accounts.dependencies")
 
 def get_user_service(db: AsyncSession = Depends(get_db)) -> UserService:
     return UserService(UserRepository(db))
@@ -58,10 +60,9 @@ async def get_current_user(
 
     # Verify if the user has revoked all sessions
     revoke_ts = await redis.get(f"user_revoke_all:{subject}")
-    if revoke_ts:
-        # If the token iat is less than the revoke timestamp, it means the token is invalid
-        if payload.get("iat", 0) < float(revoke_ts):
-            raise credentials_exception
+    iat = payload.get("iat")
+    if revoke_ts and (iat is None or iat < float(revoke_ts)):
+        raise credentials_exception
 
     try: 
         user_id = uuid.UUID(subject)
